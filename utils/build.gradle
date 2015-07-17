@@ -24,9 +24,32 @@ dependencies {
 }
 
 
-task sourceJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier "source"
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+    classpath += files(ext.androidJar)
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+task androidJar(type: Jar) {
+    from 'build/intermediates/classes/release'
+}
+
+
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
+    archives androidJar
 }
 
 publishing {
@@ -34,9 +57,11 @@ publishing {
         utils(MavenPublication) {
             groupId 'com.zaijie.utils'
             artifactId 'utils'
-            version '1.1.5'
-            artifact (sourceJar)
-            artifact("$buildDir/outputs/aar/utils-release.aar")
+            version '1.1.9'
+            artifact (androidJavadocsJar)
+            artifact (androidSourcesJar)
+            artifact (androidJar)
+            artifact("$buildDir/outputs/aar/${project.name}-release.aar")
         }
     }
 }
@@ -69,9 +94,9 @@ bintray {
         labels = ['gear', 'gore', 'gorilla']
         publicDownloadNumbers = true
         version {
-            name = '1.1.5' //Bintray logical version name
+            name = '1.1.9' //Bintray logical version name
             desc = //Optional - Version-specific description'
-             vcsTag = '1.1.5'
+             vcsTag = '1.1.9'
         }
     }
 }

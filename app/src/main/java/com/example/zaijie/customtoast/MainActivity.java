@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showCustomToast();
-                startActivity(new Intent(MainActivity.this, com.example.zaijie.utils.MainActivity.class));
+
 
             }
         });
